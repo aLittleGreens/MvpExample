@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+
+
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
+        }
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile 'com.android.support:appcompat-v7:26.1.0'
+
+    api 'com.squareup.retrofit2:retrofit:2.5.0'
+    api 'com.squareup.retrofit2:converter-gson:2.1.0'
+    api 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    api 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    //引入Log拦截器，方便DEBUG模式输出log信息
+    api 'com.squareup.okhttp3:logging-interceptor:3.5.0'
+//    api 'io.reactivex.rxjava2:rxjava:2.1.0'
+//    api 'io.reactivex.rxjava2:rxandroid:2.1.0'
+        api 'com.jakewharton:butterknife:7.0.1'//view注解
+    compile 'com.android.support:multidex:1.0.0'//分包
+    compile 'com.orhanobut:logger:1.13'//打印日志
+}
