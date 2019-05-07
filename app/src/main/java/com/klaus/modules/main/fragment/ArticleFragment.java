@@ -26,11 +26,6 @@ public class ArticleFragment extends BaseFragment<ArticlePresenter, ArticleModel
     }
 
     @Override
-    public void initPresenter() {
-        mPresenter.bindVM(this, mModel);
-    }
-
-    @Override
     protected void initView() {
         mPresenter.getArticleRequest();
     }

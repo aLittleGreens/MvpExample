@@ -20,7 +20,6 @@ public abstract class BaseFragment<P extends BasePresenter,M extends BaseModel> 
 
     protected View rootView;
     public P mPresenter;
-    public M mModel;
     public RxManager mRxManager;
 
     @Nullable
@@ -32,11 +31,11 @@ public abstract class BaseFragment<P extends BasePresenter,M extends BaseModel> 
         mRxManager=new RxManager();
         ButterKnife.bind(this, rootView);
         mPresenter = TUtil.getT(this, 0);
-        mModel= TUtil.getT(this,1);
-        if(mPresenter!=null){
-            mPresenter.mContext=this.getActivity();
+        M model = TUtil.getT(this, 1);
+        if (mPresenter != null && model != null) {
+            mPresenter.bindVM(this, model);
         }
-        initPresenter();
+//        initPresenter();
         initView();
         return rootView;
 
@@ -45,7 +44,7 @@ public abstract class BaseFragment<P extends BasePresenter,M extends BaseModel> 
     //获取布局文件
     protected abstract int getLayoutResource();
     //简单页面无需mvp就不用管此方法即可,完美兼容各种实际场景的变通
-    public abstract void initPresenter();
+//    public abstract void initPresenter();
     //初始化view
     protected abstract void initView();
 

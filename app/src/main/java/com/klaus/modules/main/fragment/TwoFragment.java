@@ -17,10 +17,6 @@ public class TwoFragment extends BaseFragment {
         return R.layout.fragment_two_layout;
     }
 
-    @Override
-    public void initPresenter() {
-
-    }
 
     @Override
     protected void initView() {

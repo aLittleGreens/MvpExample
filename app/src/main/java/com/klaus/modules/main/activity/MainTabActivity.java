@@ -88,11 +88,6 @@ public class MainTabActivity extends BaseActivity {
     }
 
     @Override
-    protected void initPresenter() {
-
-    }
-
-    @Override
     protected void initView() {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }

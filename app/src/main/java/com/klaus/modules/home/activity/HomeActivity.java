@@ -30,11 +30,6 @@ public class HomeActivity extends BaseActivity<HomePresenter, HomeModel> impleme
     }
 
     @Override
-    protected void initPresenter() {
-        mPresenter.bindVM(this, mModel);
-    }
-
-    @Override
     protected void initView() {
 
     }

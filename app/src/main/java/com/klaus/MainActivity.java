@@ -3,11 +3,13 @@ package com.klaus;
 import android.content.Intent;
 
 import com.klaus.common.base.BaseActivity;
+import com.klaus.common.rx.RxManager;
 import com.klaus.modules.home.activity.HomeActivity;
 import com.klaus.modules.main.activity.MainTabActivity;
 
 
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 
 
 public class MainActivity extends BaseActivity {
@@ -21,13 +23,13 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    protected void initPresenter() {
-
-    }
-
-    @Override
     protected void initView() {
+       mRxManager.on("klaus", new Consumer<Integer>() {
+           @Override
+           public void accept(Integer integer) throws Exception {
 
+           }
+       });
     }
 
     @Override

@@ -10,7 +10,7 @@ import com.klaus.common.rx.RxManager;
 
 public abstract class BasePresenter<V, M> {
 
-    protected Context mContext;
+//    protected Context mContext;
     protected V mView;
     protected M mModel;
 

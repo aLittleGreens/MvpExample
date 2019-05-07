@@ -28,7 +28,6 @@ public abstract class BaseActivity<P extends BasePresenter, M extends BaseModel>
     public Context mContext;
     public RxManager mRxManager;
     public P mPresenter;
-    public M mModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,8 +38,10 @@ public abstract class BaseActivity<P extends BasePresenter, M extends BaseModel>
         ButterKnife.bind(this);
         mContext = this;
         mPresenter = TUtil.getT(this, 0);
-        mModel = TUtil.getT(this, 1);
-        initPresenter();
+        M model = TUtil.getT(this, 1);
+        if (mPresenter != null && model != null) {
+            mPresenter.bindVM(this, model);
+        }
         initView();
         initEvent();
     }
@@ -60,8 +61,8 @@ public abstract class BaseActivity<P extends BasePresenter, M extends BaseModel>
     //获取布局文件
     protected abstract int initLayoutId();
 
-    //简单页面无需mvp就不用管此方法即可,完美兼容各种实际场景的变通
-    protected abstract void initPresenter();
+//    //简单页面无需mvp就不用管此方法即可,完美兼容各种实际场景的变通
+//    protected abstract void initPresenter();
 
     //初始化view
     protected abstract void initView();
