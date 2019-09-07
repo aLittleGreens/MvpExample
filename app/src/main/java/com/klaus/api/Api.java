@@ -3,10 +3,15 @@ package com.klaus.api;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.klaus.App;
+import com.klaus.api.cookie.PersistentCookieJar;
+import com.klaus.api.cookie.cache.SetCookieCache;
+import com.klaus.api.cookie.persistence.SharedPrefsCookiePersistor;
+import com.klaus.api.http.SimpleCookieJar;
 import com.klaus.common.commonutil.NetWorkUtils;
 import com.klaus.common.commonutil.ToastUitl;
 import com.klaus.common.rx.GsonDConverterFactory;
@@ -41,10 +46,12 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Created by panda on 2017/7/3.
+ * https://blog.csdn.net/weixin_42429629/article/details/81095450
  */
 
 public class Api {
+
+    private static final String TAG = "Api";
     //读超时长，单位：毫秒
     public static final int READ_TIME_OUT = 7676;
     //连接时长，单位：毫秒
@@ -115,7 +122,7 @@ public class Api {
     private Api(Context context, String baseUrl) {
         //开启Log
         HttpLoggingInterceptor logInterceptor = new HttpLoggingInterceptor();
-        logInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
+        logInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
         //缓存
         File cacheFile = new File(context.getCacheDir(), "cache");
         Cache cache = new Cache(cacheFile, 1024 * 1024 * 100); //100Mb
@@ -146,6 +153,7 @@ public class Api {
                 .addInterceptor(mRewriteCacheControlInterceptor)
                 .addNetworkInterceptor(mRewriteCacheControlInterceptor)
                 .addInterceptor(headerInterceptor)
+                .cookieJar(CookieManager.getInstance(context).getCookieJar())
                 .addInterceptor(logInterceptor)
                 .sslSocketFactory(sslSocketFactory)
                 .hostnameVerifier(new HostnameVerifier() {
@@ -166,8 +174,8 @@ public class Api {
 
         retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
-                               . addConverterFactory(GsonConverterFactory.create()).
-                addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create()).
+                        addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 //                .addConverterFactory(GsonDConverterFactory.create(gson))
 ////              .addConverterFactory(GsonConverterFactory.create(gson))
 //                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -178,8 +186,8 @@ public class Api {
 
     }
 
-    public  ApiService apiService;
-    static String baseUrl = "http://wanandroid.com/";
+    public ApiService apiService;
+    static String baseUrl = "https://wanandroid.com/";
 
 //    /**
 //
@@ -219,24 +227,21 @@ public class Api {
 
     /**
      * 云端响应头拦截器，用来配置缓存策略
-     * Dangerous interceptor that rewrites the server's cache-control header.
+     * Dangerous interceptor that rewrites the server's cache-control header.、
+     * maxAge:没有超出maxAge,不管怎么样都是返回缓存数据，超过了maxAge,发起新的请求获取数据更新，请求失败返回缓存数据
+     * maxStale:没有超过maxStale，不管怎么样都返回缓存数据，超过了maxStale,发起请求获取更新数据，请求失败返回失败
      */
     private final Interceptor mRewriteCacheControlInterceptor = new Interceptor() {
         @Override
         public Response intercept(Chain chain) throws IOException {
             Request request = chain.request();
             String cacheControl = request.cacheControl().toString();
-            if (!NetWorkUtils.isNetConnected(sContext)) {
-                request = request.newBuilder()
-                        .cacheControl(TextUtils.isEmpty(cacheControl) ? CacheControl.FORCE_NETWORK : CacheControl.FORCE_CACHE)
-                        .build();
-            }
+            Log.e(TAG, "cacheControl:" + cacheControl + " isNetConnect:" + NetWorkUtils.isNetConnected(sContext));
             Response originalResponse = chain.proceed(request);
             if (NetWorkUtils.isNetConnected(sContext)) {
-                //有网的时候读接口上的@Headers里的配置，你可以在这里进行统一的设置
-
                 return originalResponse.newBuilder()
-                        .header("Cache-Control", cacheControl)
+                        .header("Cache-Control", cacheControl)//有网的时候读接口上的@Headers里的配置，你可以在这里进行统一的设置
+//                        .header("Cache-Control", TextUtils.isEmpty(cacheControl) ? "Cache-Control:public ,max-age=60" : cacheControl)// 有网也要使用缓存
                         .removeHeader("Pragma")
                         .build();
             } else {

@@ -1,12 +1,16 @@
 package com.klaus.api;
 
 
+import com.klaus.bean.LoginBean;
 import com.klaus.bean.WXarticle;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Streaming;
 import retrofit2.http.Url;
@@ -45,6 +49,7 @@ public interface ApiService {
      *
      * @return
      */
+    @Headers("Cache-Control:public ,max-age=60")
     @GET("http://wanandroid.com/wxarticle/chapters/json")
     Observable<WXarticle> getArticle();
 
@@ -53,11 +58,17 @@ public interface ApiService {
      *
      * @param url 可以动态改变
      */
-    @Headers("Cache-Control:public ,max-age=60")
+
     @GET()
     Observable<WXarticle> getArticleUrl(@Url String url);
 
     /**
      * 也可以用拦截器拦截head，不需要改变URl的不需要设置，拦截器通过拦截head，重新设置URL
      */
+
+
+    // 登录
+    @FormUrlEncoded
+    @POST("user/login")
+    Observable<LoginBean> login(@Field("username") String userName, @Field("password") String password);
 }
